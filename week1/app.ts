@@ -36,16 +36,6 @@ const getHexRepresentation = (num: number): string => {
     .replace(/^0x(0)*/, "0x");
 };
 
-const isAddressSmartContract = async (address: string): Promise<boolean> => {
-  const { provider } = await getWalletAndProvider();
-  return (await provider.getCode(address)) !== "0x";
-};
-
-const findBlockwithFirstSmartContract = async () => {
-    
-
-}
-
 const getBlockDataByNumber = async (
   blockNumber: number
 ): Promise<Record<string, string>> => {
@@ -75,6 +65,40 @@ const getBlockTransactions = async (blockNumber: number) => {
         ])
       )
   );
+};
+
+const isAddressSmartContract = async (address: string): Promise<boolean> => {
+  const { provider } = await getWalletAndProvider();
+  return (await provider.getCode(address)) !== "0x";
+};
+
+const findBlockwithFirstSmartContract = async () => {
+  const batchSize = 5000;
+  let start = 0;
+  const { provider } = await getWalletAndProvider();
+
+  const findBatch = async (start: number) => {
+    console.log(`Starting Batch ${start / batchSize}`);
+    let blocksTransactions = await Promise.all(
+      Array(batchSize)
+        .fill(0)
+        .map((_, index) => getBlockTransactions(start + index))
+    );
+    await blocksTransactions.forEach(
+      async (transactions: Record<string, string>[]) => {
+        await transactions.forEach(async (transaction) => {
+          if (await isAddressSmartContract(transaction.to)) {
+            console.log(`Found first transaction to contract: ${transaction}`);
+          }
+        });
+      }
+    );
+    console.log(`Ending Batch ${start / batchSize}`);
+  };
+  while (true) {
+    await findBatch(start);
+    start += batchSize;
+  }
 };
 
 const module2 = async (): Promise<void> => {
@@ -150,6 +174,7 @@ const main = async (): Promise<void> => {
   //   await module2();
   //   await module3();
   // console.log(await getBlockTransactions(4217858));
+  await findBlockwithFirstSmartContract();
 };
 
 main().then(() => {});
