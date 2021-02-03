@@ -1,9 +1,8 @@
 import { ethers, providers, utils, Wallet } from "ethers";
 import fs from "fs";
-import { maxHeaderSize } from "http";
 import data from "./data";
 
-const gethNodeUrl = "http://127.0.0.1:9545";
+const gethNodeUrl = "http://127.0.0.1:8545";
 const jsonPrivateKeyData = JSON.stringify(data);
 const privateKeyPassword = "gammartbym";
 const message = "gEth is Money";
@@ -54,7 +53,6 @@ const getBlockTransactions = async (blockNumber: number) => {
     ]),
     16
   );
-  console.log(blockTransactionCount);
   return Promise.all(
     Array(blockTransactionCount)
       .fill(0)
