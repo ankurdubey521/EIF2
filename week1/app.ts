@@ -77,8 +77,7 @@ const findBlockwithFirstSmartContract = async () => {
 
   const findBatch = async (start: number) => {
     console.log(`Starting Batch ${start / batchSize}`);
-    let minIndex = 10000000000,
-      minTransaction = {};
+    
     let blocksTransactions = await Promise.all(
       Array(batchSize)
         .fill(0)
@@ -87,18 +86,13 @@ const findBlockwithFirstSmartContract = async () => {
     await blocksTransactions.forEach(
       async (transactions: Record<string, string>[]) => {
         await transactions.forEach(async (transaction) => {
-          if (await isAddressSmartContract(transaction.to)) {
-            if (parseInt(transaction.blockNumber, 16) <= minIndex) {
-              minIndex = parseInt(transaction.blockNumber, 16);
-              minTransaction = transaction;
-            }
+          if (transaction.to === null || await isAddressSmartContract(transaction.to)) {
+            console.log(transaction.blockNumber)
           }
         });
       }
     );
-    if (minIndex != 10000000000) {
-      console.log(`Found Transaction ${JSON.stringify(minTransaction)}`);
-    }
+   
     console.log(`Ending Batch ${start / batchSize}`);
   };
   while (true) {
