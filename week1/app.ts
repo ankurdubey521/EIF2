@@ -71,33 +71,35 @@ const isAddressSmartContract = async (address: string): Promise<boolean> => {
 };
 
 const findBlockwithFirstSmartContract = async () => {
-  const batchSize = 5000;
+  const batchSize = 1000;
   let start = 0;
   const { provider } = await getWalletAndProvider();
 
   const findBatch = async (start: number) => {
-    try {
-      console.log(`Starting Batch ${start / batchSize}`);
-      let blocksTransactions = await Promise.all(
-        Array(batchSize)
-          .fill(0)
-          .map((_, index) => getBlockTransactions(start + index))
-      );
-      await blocksTransactions.forEach(
-        async (transactions: Record<string, string>[]) => {
-          await transactions.forEach(async (transaction) => {
-            if (await isAddressSmartContract(transaction.to)) {
-              console.log(
-                `Found first transaction to contract: ${JSON.stringify(
-                  transaction
-                )}`
-              );
+    console.log(`Starting Batch ${start / batchSize}`);
+    let minIndex = 10000000000,
+      minTransaction = {};
+    let blocksTransactions = await Promise.all(
+      Array(batchSize)
+        .fill(0)
+        .map((_, index) => getBlockTransactions(start + index))
+    );
+    await blocksTransactions.forEach(
+      async (transactions: Record<string, string>[]) => {
+        await transactions.forEach(async (transaction) => {
+          if (await isAddressSmartContract(transaction.to)) {
+            if (parseInt(transaction.blockNumber, 16) <= minIndex) {
+              minIndex = parseInt(transaction.blockNumber, 16);
+              minTransaction = transaction;
             }
-          });
-        }
-      );
-      console.log(`Ending Batch ${start / batchSize}`);
-    } catch (e) {}
+          }
+        });
+      }
+    );
+    if (minIndex != 10000000000) {
+      console.log(`Found Transaction ${JSON.stringify(minTransaction)}`);
+    }
+    console.log(`Ending Batch ${start / batchSize}`);
   };
   while (true) {
     await findBatch(start);
