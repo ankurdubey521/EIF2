@@ -76,22 +76,28 @@ const findBlockwithFirstSmartContract = async () => {
   const { provider } = await getWalletAndProvider();
 
   const findBatch = async (start: number) => {
-    console.log(`Starting Batch ${start / batchSize}`);
-    let blocksTransactions = await Promise.all(
-      Array(batchSize)
-        .fill(0)
-        .map((_, index) => getBlockTransactions(start + index))
-    );
-    await blocksTransactions.forEach(
-      async (transactions: Record<string, string>[]) => {
-        await transactions.forEach(async (transaction) => {
-          if (await isAddressSmartContract(transaction.to)) {
-            console.log(`Found first transaction to contract: ${transaction}`);
-          }
-        });
-      }
-    );
-    console.log(`Ending Batch ${start / batchSize}`);
+    try {
+      console.log(`Starting Batch ${start / batchSize}`);
+      let blocksTransactions = await Promise.all(
+        Array(batchSize)
+          .fill(0)
+          .map((_, index) => getBlockTransactions(start + index))
+      );
+      await blocksTransactions.forEach(
+        async (transactions: Record<string, string>[]) => {
+          await transactions.forEach(async (transaction) => {
+            if (await isAddressSmartContract(transaction.to)) {
+              console.log(
+                `Found first transaction to contract: ${JSON.stringify(
+                  transaction
+                )}`
+              );
+            }
+          });
+        }
+      );
+      console.log(`Ending Batch ${start / batchSize}`);
+    } catch (e) {}
   };
   while (true) {
     await findBatch(start);
