@@ -1,1 +1,0 @@
-ssh -i ~/.ssh/ankurdubey-test.pem -f -N -L 9545:localhost:8545 ankurdubey@23.96.61.110
