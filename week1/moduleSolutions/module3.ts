@@ -6,7 +6,7 @@ import {
   getBlockTransactions,
   getBlockDataByNumber,
   ethereumTransaction,
-} from "../../utils/utils";
+} from "../utils/utils";
 
 const findBlockwithFirstSmartContract = async () => {
   const batchSize = 1000;
@@ -64,7 +64,7 @@ const module3 = async (): Promise<void> => {
     .map((x) => x.hash)
     .reduce((a: string, b: string): string => `${a}\n${b}`);
   fs.writeFile(
-    path.resolve(__dirname, "../../data/hash_first_128_goerli_blocks.txt"),
+    path.resolve(__dirname, "../data/hash_first_128_goerli_blocks.txt"),
     hashValuesFirst128BlocksGoerli,
     (err: any) => {
       if (err) throw err;

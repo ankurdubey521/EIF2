@@ -1,7 +1,7 @@
 import { ethers, providers, utils } from "ethers";
 
-import { getWalletAndProvider } from "../../utils/utils";
-import { MESSAGE } from "../../data/constants";
+import { getWalletAndProvider } from "../utils/utils";
+import { MESSAGE } from "../data/constants";
 
 const module2 = async (): Promise<void> => {
   console.log("Running Module 2");
