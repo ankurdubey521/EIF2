@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
-contract PizzaTokens {
+contract PizzaToken {
     uint256 totalTokenSupply;
     address tokenCreator;
 
@@ -38,6 +38,14 @@ contract PizzaTokens {
     }
 
     /**
+     * @dev Returns owner's address
+     * @return address
+     */
+    function owner() public view returns (address) {
+        return tokenCreator;
+    }
+
+    /**
      * @dev Return amount of tokens held by an address
      * @param tokenOwner address of owner
      * @return uint256
@@ -69,8 +77,8 @@ contract PizzaTokens {
     function transfer(address to, uint256 tokens) public returns (bool) {
         require(balances[msg.sender] >= tokens, "INSUFFICIENT_FUNDS");
 
-        balances[msg.sender] = balances[msg.sender] -= tokens;
-        balances[to] = balances[to] += tokens;
+        balances[msg.sender] -= tokens;
+        balances[to] += tokens;
         emit Transfer(msg.sender, to, tokens);
 
         console.log("Transferred ", tokens, " tokens");
@@ -107,12 +115,12 @@ contract PizzaTokens {
         address to,
         uint256 tokens
     ) public returns (bool) {
-        require(balances[msg.sender] >= tokens, "INSUFFICIENT_FUNDS");
+        require(balances[from] >= tokens, "INSUFFICIENT_FUNDS");
         require(allowed[from][msg.sender] >= tokens, "APPROVED_LIMIT_EXCEEDED");
 
-        balances[from] = balances[from] -= tokens;
-        allowed[from][msg.sender] = allowed[from][msg.sender] -= tokens;
-        balances[to] = balances[to] += tokens;
+        balances[from] -= tokens;
+        allowed[from][msg.sender] -= tokens;
+        balances[to] += tokens;
         emit Transfer(from, to, tokens);
 
         console.log("Transferred ", tokens, " tokens");

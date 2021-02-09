@@ -17,7 +17,7 @@ describe("Storage Module 2d", function () {
       .map(() => Math.floor(Math.random() * 1e6));
     for (let value of randomNumbers) {
       await storageContract.store(value);
-      await expect((await storageContract.retrieve()).toString()).equals(
+      await expect(await storageContract.retrieve()).to.equal(
         value.toString()
       );
     }
