@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
-// Token Address: 0x194b8237506673e0EB174090F38E7c615FDF4C62
+// Token Address: 0x80f4150DeAacf17BA2Ae00D7206d8E985521EAb4
 
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract PizzaToken {
-    uint256 totalTokenSupply;
+    uint256 _totalSupply;
+    string public symbol = "PIZZA";
+    string public  name = "PIZZA TOKEN";
+    uint8 public decimals = 0;
     address tokenCreator;
 
     mapping(address => uint256) balances;
@@ -18,14 +21,14 @@ contract PizzaToken {
     );
     event Transfer(address indexed from, address indexed to, uint256 tokens);
 
-    constructor(uint256 _totalSupply) {
-        totalTokenSupply = _totalSupply;
+    constructor(uint256 totalSupply_) {
+        _totalSupply = totalSupply_;
         tokenCreator = msg.sender;
-        balances[msg.sender] = _totalSupply;
+        balances[msg.sender] = totalSupply_;
 
         console.log(
             "Token contract initialized with ",
-            totalTokenSupply,
+            _totalSupply,
             " tokens"
         );
     }
@@ -35,7 +38,7 @@ contract PizzaToken {
      * @return uint256
      */
     function totalSupply() public view returns (uint256) {
-        return totalTokenSupply;
+        return _totalSupply;
     }
 
     /**
