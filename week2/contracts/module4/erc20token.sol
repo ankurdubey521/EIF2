@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 // Token Address: 0x80f4150DeAacf17BA2Ae00D7206d8E985521EAb4
+// Pair Address: 0xDB83e422478316DFa9da92D8A1748e57BE168F24
 
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
