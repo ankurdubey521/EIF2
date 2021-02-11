@@ -131,22 +131,47 @@ contract MultiSigWallet {
      * @dev takes a transaction and returns it's keccak256 hash
      * @param t input transaction
      */
-    function getTransactionHash(Transaction memory t) public pure returns (bytes32) {
-        return keccak256(abi.encode(t.wallet, t.to, t.amount, t.transactionType, t.token, t.nonce));
+    function getTransactionHash(Transaction memory t)
+        public
+        pure
+        returns (bytes32)
+    {
+        return
+            keccak256(
+                abi.encode(
+                    t.wallet,
+                    t.to,
+                    t.amount,
+                    t.transactionType,
+                    t.token,
+                    t.nonce
+                )
+            );
     }
 
     /**
      * @dev recovers address given the transaction's signature and the transaction
      * @param t transaction input transaction
-     * @param v uint8 
+     * @param v uint8
      * @param r bytes32
      * @param s bytes32
      * @return recovered address
      */
-    function recoverAddressFromTransactionSignature(Transaction memory t, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
+    function recoverAddressFromTransactionSignature(
+        Transaction memory t,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public pure returns (address) {
         bytes32 transactionHash = getTransactionHash(t);
-        bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", transactionHash));
-        return ecrecover(messageHash, v, r, s); 
+        bytes32 messageHash =
+            keccak256(
+                abi.encodePacked(
+                    "\x19Ethereum Signed Message:\n32",
+                    transactionHash
+                )
+            );
+        return ecrecover(messageHash, v, r, s);
     }
 
     /**

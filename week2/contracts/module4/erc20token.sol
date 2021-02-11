@@ -8,7 +8,7 @@ import "hardhat/console.sol";
 contract PizzaToken {
     uint256 _totalSupply;
     string public symbol = "PIZZA";
-    string public  name = "PIZZA TOKEN";
+    string public name = "PIZZA TOKEN";
     uint8 public decimals = 0;
     address tokenCreator;
 
