@@ -1,11 +1,10 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { expect, should } from "chai";
-import { Signer } from "crypto";
 import { BigNumber, Contract } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 
-describe("DeadManSwitch Module 4", function () {
+describe("DeadManSwitch Module 5", function () {
   let dmsContract: Contract;
   let owner: SignerWithAddress;
   let reciever: SignerWithAddress;
@@ -51,7 +50,7 @@ describe("DeadManSwitch Module 4", function () {
       );
 
       // Check contract balance
-      await expect(
+      expect(
         await ethers.provider.getBalance(dmsContract.address)
       ).is.equal(parseEther("3"));
     });

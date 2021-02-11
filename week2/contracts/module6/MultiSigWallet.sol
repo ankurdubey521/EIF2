@@ -29,7 +29,7 @@ contract MultiSigWallet {
     mapping(address => bool) public isMember;
     uint256 public nonce = 0; // Equivalently number of transactions processes by the contract
     uint256 public totalMembers = 0;
-    uint256 public threshold;
+    uint256 public threshold = 0;
 
     /**
      * @dev Restricts calls to owner
@@ -62,7 +62,7 @@ contract MultiSigWallet {
     function addOwner(address newOwnerAddress) public onlyOwner {
         isOwner[newOwnerAddress] = true;
         addMember(newOwnerAddress);
-        console.log("addOwner: new owner ", newOwnerAddress, " added");
+        console.log("addOwner: New Owner ", newOwnerAddress, " Added");
     }
 
     /**
@@ -98,7 +98,7 @@ contract MultiSigWallet {
         public
         onlyOwner
     {
-        require(newThreshold <= totalMembers + 1, "INVALID_THRESOLD");
+        require(newThreshold <= totalMembers + 1, "INVALID_THRESHOLD");
         addMember(newMemberAddress);
         threshold = newThreshold;
         console.log("addMember: New Threshold: ", newThreshold);
@@ -106,6 +106,7 @@ contract MultiSigWallet {
 
     /**
      * @dev Removes a member, but only existing owners can remove members.
+     *      Owner cannot be removed without downgrading to member first
      * @param memberAddress address of member to be removed
      * @param newThreshold updated threshold value
      */
@@ -114,9 +115,10 @@ contract MultiSigWallet {
         onlyOwner
     {
         require(isMember[memberAddress], "ADDRESS_NOT_MEMBER");
+        require(!isOwner[memberAddress], "ADDRESS_IS_OWNER");
         require(newThreshold <= totalMembers - 1, "INVALID_THRESHOLD");
         isMember[memberAddress] = false;
-        threshold -= 1;
+        totalMembers -= 1;
         console.log("removeMember: Removed member: ", memberAddress);
         console.log("removeMember: New Threshold:", newThreshold);
     }
