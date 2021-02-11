@@ -5,29 +5,9 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract MultiSigWallet {
-    /**
-     * @dev Defines a transaction entity
-     * @param wallet address of the wallet from which the tx originates,
-     *        to confirm if the transaction originates from this wallet\
-     * @param to address of reciever
-     * @param amount amount of wei/erc20 tokens to send
-     * @param transactionType 0 represents ETH transfer, 1 represents ERC20 transfer
-     * @param token address of erc20token contract if transactionType is 1 else 0x0
-     * @param nonce to prevent replay of tx, equal to the current amount of treansactions
-     *        processed by the wallet
-     */
-    struct Transaction {
-        address wallet;
-        address payable to;
-        uint256 amount;
-        uint256 transactionType;
-        address token;
-        uint256 nonce;
-    }
-
     mapping(address => bool) public isOwner;
     mapping(address => bool) public isMember;
-    uint256 public nonce = 0; // Equivalently number of transactions processes by the contract
+    uint256 public nonce = 0; // Equivalently the number of transactions processed by the contract
     uint256 public totalMembers = 0;
     uint256 public threshold = 0;
 
@@ -53,6 +33,8 @@ contract MultiSigWallet {
         totalMembers = 1;
         console.log("constructor: wallet created by ", msg.sender);
     }
+
+    // Member Control Methods
 
     /**
      * @dev Allows addition of new owners, but only exisiting owners can add new owners.
@@ -121,6 +103,50 @@ contract MultiSigWallet {
         totalMembers -= 1;
         console.log("removeMember: Removed member: ", memberAddress);
         console.log("removeMember: New Threshold:", newThreshold);
+    }
+
+    // Transaction Verification
+
+    /**
+     * @dev Defines a transaction entity
+     * @param wallet address of the wallet from which the tx originates,
+     *        to confirm if the transaction originates from this wallet\
+     * @param to address of reciever
+     * @param amount amount of wei/erc20 tokens to send
+     * @param transactionType 0 represents ETH transfer, 1 represents ERC20 transfer
+     * @param token address of erc20token contract if transactionType is 1 else 0x0
+     * @param nonce to prevent replay of tx, equal to the current amount of treansactions
+     *        processed by the wallet
+     */
+    struct Transaction {
+        address wallet;
+        address payable to;
+        uint256 amount;
+        uint256 transactionType;
+        address token;
+        uint256 nonce;
+    }
+
+    /**
+     * @dev takes a transaction and returns it's keccak256 hash
+     * @param t input transaction
+     */
+    function getTransactionHash(Transaction memory t) public pure returns (bytes32) {
+        return keccak256(abi.encode(t.wallet, t.to, t.amount, t.transactionType, t.token, t.nonce));
+    }
+
+    /**
+     * @dev recovers address given the transaction's signature and the transaction
+     * @param t transaction input transaction
+     * @param v uint8 
+     * @param r bytes32
+     * @param s bytes32
+     * @return recovered address
+     */
+    function recoverAddressFromTransactionSignature(Transaction memory t, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
+        bytes32 transactionHash = getTransactionHash(t);
+        bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", transactionHash));
+        return ecrecover(messageHash, v, r, s); 
     }
 
     /**

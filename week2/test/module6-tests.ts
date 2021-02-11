@@ -1,6 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { expect, should } from "chai";
+import { sign } from "crypto";
 import { BigNumber, Contract } from "ethers";
+import { hashMessage } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 
 describe("Multi Signature Wallet Module 6", function () {
@@ -120,6 +122,105 @@ describe("Multi Signature Wallet Module 6", function () {
       await expect(
         walletContract.removeMember(member1.address, 2)
       ).to.be.revertedWith("INVALID_THRESHOLD");
+    });
+  });
+
+  describe("Transactions Management", async function () {
+    interface Transaction {
+      wallet: string;
+      to: string;
+      amount: number;
+      transactionType: 0 | 1;
+      token: string;
+      nonce: number;
+    }
+
+    /**
+     * @dev comptues a hash for transaction
+     * @param transaction input transaction
+     */
+    const getTransactionHash = (transaction: Transaction): string =>
+      ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(
+          [
+            "address",
+            "address payable",
+            "uint256",
+            "uint256",
+            "address",
+            "uint256",
+          ],
+          [
+            transaction.wallet,
+            transaction.to,
+            transaction.amount,
+            transaction.transactionType,
+            transaction.token,
+            transaction.nonce,
+          ]
+        )
+      );
+
+    /**
+     * @dev comptues signature for transaction
+     * @param transaction input transaction
+     * @param signer account using which tx is to be signed
+     */
+    const signTransaction = async (
+      transaction: Transaction,
+      signer: SignerWithAddress
+    ): Promise<{
+      v: number;
+      r: string;
+      s: string;
+    }> => {
+      const hash = getTransactionHash(transaction);
+      const hashBytes = ethers.utils.arrayify(hash);
+      const signature = await signer.signMessage(hashBytes);
+      const { v, r, s } = ethers.utils.splitSignature(signature);
+      return { v, r, s };
+    };
+
+    it("Should return correct transaction hash", async function () {
+      // Generate a transaction hash and compare it with what solidity gives
+      const transaction: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+
+      const hashExpected = getTransactionHash(transaction);
+
+      const hashFromContract = await walletContract.getTransactionHash(
+        transaction
+      );
+
+      expect(hashFromContract).to.equal(hashExpected);
+    });
+
+    it("Should return verify transaction signature", async function () {
+      // Sign a transaciton and try to recover the address from solidity
+      const transaction: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+      const { v, r, s } = await signTransaction(transaction, owner1);
+
+      const addressFromContract = await walletContract.recoverAddressFromTransactionSignature(
+        transaction,
+        v,
+        r,
+        s
+      );
+
+      expect(addressFromContract).to.equal(owner1.address);
     });
   });
 });

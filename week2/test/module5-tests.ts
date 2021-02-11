@@ -68,18 +68,19 @@ describe("DeadManSwitch Module 5", function () {
 
   describe("Dead Man Functionality", async function () {
     let maxBlocksBetweenAliveCalls: BigNumber;
-    let contractBalance: number;
+    let contractBalanceEth: number;
 
     beforeEach(async function () {
+      contractBalanceEth = 0.00001;
+
       // Send 10ETH to contract
       await owner.sendTransaction({
         to: dmsContract.address,
-        value: parseEther("10"),
+        value: parseEther(contractBalanceEth.toString()),
       });
 
       // Get data
       maxBlocksBetweenAliveCalls = await dmsContract.maxBlocksBetweenAliveCalls();
-      contractBalance = 10;
     });
     /**
      * @dev Each transaction adds a new block to the hardhat network
@@ -109,7 +110,7 @@ describe("DeadManSwitch Module 5", function () {
      *      and if the reciever recieved all the funds or not.
      * @param contract contract to be tested
      * @param reciever: address of reciever who will recieve funds after self destruct
-     * @param expectedContractBalance: balance of contract before self destruct
+     * @param expectedContractBalance: balance of contract before self destruct in wei
      */
     interface Operation {
       (): Promise<void>;
@@ -118,10 +119,10 @@ describe("DeadManSwitch Module 5", function () {
       operation: Operation,
       contract: Contract,
       reciever: SignerWithAddress,
-      expectedContractBalance: number
+      expectedContractBalance: BigNumber
     ) => {
       // Check if tokens were transferred
-      expect(operation).to.changeEtherBalances(
+      await expect(operation).to.changeEtherBalances(
         [contract, reciever],
         [-expectedContractBalance, +expectedContractBalance]
       );
@@ -133,10 +134,10 @@ describe("DeadManSwitch Module 5", function () {
       operation: Operation,
       contract: Contract,
       reciever: SignerWithAddress,
-      expectedContractBalance: number
+      expectedContractBalance: BigNumber
     ) => {
       // Check if tokens were transferred
-      expect(operation).to.not.changeEtherBalances(
+      await expect(operation).to.not.changeEtherBalances(
         [contract, reciever],
         [-expectedContractBalance, +expectedContractBalance]
       );
@@ -163,7 +164,7 @@ describe("DeadManSwitch Module 5", function () {
           async () => await dmsContract.checkIfStillAliveWasCalledRecently(),
           dmsContract,
           reciever,
-          contractBalance
+          parseEther(contractBalanceEth.toString())
         );
         await addBlocks(1);
       }
@@ -183,7 +184,7 @@ describe("DeadManSwitch Module 5", function () {
         async () => await dmsContract.checkIfStillAliveWasCalledRecently(),
         dmsContract,
         reciever,
-        contractBalance
+        parseEther(contractBalanceEth.toString())
       );
     });
   });
