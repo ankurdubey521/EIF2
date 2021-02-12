@@ -26,7 +26,7 @@ describe("Multi Signature Wallet Module 6", function () {
     ] = await ethers.getSigners();
     walletContract = await walletFactory.deploy();
   });
-  /*
+
   describe("Owner and Member Managament", async function () {
     it("Should initialize contract owner properly", async function () {
       // Check status of owner and unadded member
@@ -123,7 +123,7 @@ describe("Multi Signature Wallet Module 6", function () {
         walletContract.removeMember(member1.address, 2)
       ).to.be.revertedWith("INVALID_THRESHOLD");
     });
-  }); */
+  });
 
   interface Transaction {
     wallet: string;
