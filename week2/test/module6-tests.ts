@@ -1,8 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { expect, should } from "chai";
 import { sign } from "crypto";
-import { BigNumber, Contract } from "ethers";
-import { hashMessage } from "ethers/lib/utils";
+import { BigNumber, Contract, Transaction } from "ethers";
+import { hashMessage, parseEther } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 
 describe("Multi Signature Wallet Module 6", function () {
@@ -26,7 +26,7 @@ describe("Multi Signature Wallet Module 6", function () {
     ] = await ethers.getSigners();
     walletContract = await walletFactory.deploy();
   });
-
+  /*
   describe("Owner and Member Managament", async function () {
     it("Should initialize contract owner properly", async function () {
       // Check status of owner and unadded member
@@ -123,64 +123,63 @@ describe("Multi Signature Wallet Module 6", function () {
         walletContract.removeMember(member1.address, 2)
       ).to.be.revertedWith("INVALID_THRESHOLD");
     });
-  });
+  }); */
 
-  describe("Transactions Management", async function () {
-    interface Transaction {
-      wallet: string;
-      to: string;
-      amount: number;
-      transactionType: 0 | 1;
-      token: string;
-      nonce: number;
-    }
+  interface Transaction {
+    wallet: string;
+    to: string;
+    amount: number;
+    transactionType: 0 | 1;
+    token: string;
+    nonce: number;
+  }
+  /**
+   * @dev comptues a hash for transaction
+   * @param transaction input transaction
+   */
+  const getTransactionHash = (transaction: Transaction): string =>
+    ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        [
+          "address",
+          "address payable",
+          "uint256",
+          "uint256",
+          "address",
+          "uint256",
+        ],
+        [
+          transaction.wallet,
+          transaction.to,
+          transaction.amount,
+          transaction.transactionType,
+          transaction.token,
+          transaction.nonce,
+        ]
+      )
+    );
 
-    /**
-     * @dev comptues a hash for transaction
-     * @param transaction input transaction
-     */
-    const getTransactionHash = (transaction: Transaction): string =>
-      ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(
-          [
-            "address",
-            "address payable",
-            "uint256",
-            "uint256",
-            "address",
-            "uint256",
-          ],
-          [
-            transaction.wallet,
-            transaction.to,
-            transaction.amount,
-            transaction.transactionType,
-            transaction.token,
-            transaction.nonce,
-          ]
-        )
-      );
+  /**
+   * @dev comptues signature for transaction
+   * @param transaction input transaction
+   * @param signer account using which tx is to be signed
+   */
+  const signTransaction = async (
+    transaction: Transaction,
+    signer: SignerWithAddress
+  ): Promise<{
+    v: number;
+    r: string;
+    s: string;
+  }> => {
+    const hash = getTransactionHash(transaction);
+    const hashBytes = ethers.utils.arrayify(hash);
+    const signature = await signer.signMessage(hashBytes);
+    const { v, r, s } = ethers.utils.splitSignature(signature);
+    return { v, r, s };
+  };
 
-    /**
-     * @dev comptues signature for transaction
-     * @param transaction input transaction
-     * @param signer account using which tx is to be signed
-     */
-    const signTransaction = async (
-      transaction: Transaction,
-      signer: SignerWithAddress
-    ): Promise<{
-      v: number;
-      r: string;
-      s: string;
-    }> => {
-      const hash = getTransactionHash(transaction);
-      const hashBytes = ethers.utils.arrayify(hash);
-      const signature = await signer.signMessage(hashBytes);
-      const { v, r, s } = ethers.utils.splitSignature(signature);
-      return { v, r, s };
-    };
-
+  describe("Transactions Signature and Hash Verification", async function () {
     it("Should return correct transaction hash", async function () {
       // Generate a transaction hash and compare it with what solidity gives
       const transaction: Transaction = {
@@ -221,6 +220,101 @@ describe("Multi Signature Wallet Module 6", function () {
       );
 
       expect(addressFromContract).to.equal(owner1.address);
+    });
+  });
+  describe("Transaction Verification and Execution", async function () {
+    /**
+     * @dev comptues signature arrays transaction
+     * @param t input transaction
+     * @param signers array of accounts
+     */
+    const getSignatureArrays = async (
+      t: Transaction,
+      signers: SignerWithAddress[]
+    ): Promise<{ v: number[]; r: string[]; s: string[] }> => {
+      const signatures = await Promise.all(
+        signers.map((signer) => signTransaction(t, signer))
+      );
+      const signatureArrays: { v: number[]; r: string[]; s: string[] } = {
+        v: [],
+        r: [],
+        s: [],
+      };
+      signatures.forEach(({ v, r, s }) => {
+        signatureArrays.v.push(v);
+        signatureArrays.r.push(r);
+        signatureArrays.s.push(s);
+      });
+      return signatureArrays;
+    };
+
+    beforeEach(async function () {
+      // Setup a 2 of 3 threshold with 1 owner
+      await walletContract["addMember(address)"](member1.address);
+      await walletContract["addMember(address,uint256)"](member2.address, 2);
+
+      // Send 10 ETH to walletContract
+      await owner1.sendTransaction({
+        to: walletContract.address,
+        value: parseEther("10"),
+      });
+    });
+
+    it("Should be able to execute eth transaction when threshold is met", async function () {
+      // Create a transaction and check if it executes
+      const t: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+      const members = [owner1, member1];
+      const { v, r, s } = await getSignatureArrays(t, members);
+
+      // Check transaction
+      await expect(
+        async () =>
+          await walletContract.executeTransaction(
+            t,
+            v,
+            r,
+            s,
+            members.map((member) => member.address)
+          )
+      ).to.changeEtherBalances([walletContract, member3], [-10, +10]);
+
+      // Check nonce
+      expect(await walletContract.nonce()).to.equal(1);
+    });
+
+    it("Should be reject transaction when threshold is not met", async function () {
+      // Create a transaction and check if it executes
+      const t: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+      const members = [member1];
+      const { v, r, s } = await getSignatureArrays(t, members);
+
+      // Check transaction
+      await expect(
+        walletContract.executeTransaction(
+          t,
+          v,
+          r,
+          s,
+          members.map((member) => member.address)
+        )
+      ).to.be.revertedWith("INSUFFICIENT_MEMBERS");
+
+      // Check nonce
+      expect(await walletContract.nonce()).to.equal(0);
     });
   });
 });
