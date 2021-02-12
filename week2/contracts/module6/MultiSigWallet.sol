@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
-// Contract Address: 0xc9d1F72475FD6d6034399032704d7EAced7FDd28
+// Contract Address: 0xa85b5D6eD37A65cC82E476365B1EEa26e6EFf77d
+// Required tx to transfer 0.002 ETH: https://goerli.etherscan.io/tx/0x7067db845503b1efa9556a4863340384c51c3026c9243c02d95587da6a0c4c8f
 
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
