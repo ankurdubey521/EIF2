@@ -2,7 +2,7 @@
 
 The contract implements a simple multi signature wallet that can recieve and send ETH.
 
-## User Management:
+## User Management
 
 The contract support two kinds of users, **owners** and **members**. All owners are also members.
 Members are users who can sign a transaction, but not add or remove existing members or change the threshold, which can only be done by owners.
