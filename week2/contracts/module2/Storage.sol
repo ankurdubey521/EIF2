@@ -7,21 +7,21 @@ pragma solidity ^0.8.0;
  * @dev Store & retrieve value in a variable
  */
 contract StorageModule2 {
-    uint256 number;
+  uint256 number;
 
-    /**
-     * @dev Store value in variable
-     * @param num value to store
-     */
-    function store(uint256 num) public {
-        number = num;
-    }
+  /**
+   * @dev Store value in variable
+   * @param num value to store
+   */
+  function store(uint256 num) public {
+    number = num;
+  }
 
-    /**
-     * @dev Return value
-     * @return value of 'number'
-     */
-    function retrieve() public view returns (uint256) {
-        return number;
-    }
+  /**
+   * @dev Return value
+   * @return value of 'number'
+   */
+  function retrieve() public view returns (uint256) {
+    return number;
+  }
 }
