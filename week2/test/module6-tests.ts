@@ -289,7 +289,7 @@ describe("Multi Signature Wallet Module 6", function () {
       expect(await walletContract.nonce()).to.equal(1);
     });
 
-    it("Should be reject transaction when threshold is not met", async function () {
+    it("Should reject transaction when threshold is not met", async function () {
       // Create a transaction and check if it executes
       const t: Transaction = {
         wallet: walletContract.address,
@@ -312,6 +312,118 @@ describe("Multi Signature Wallet Module 6", function () {
           members.map((member) => member.address)
         )
       ).to.be.revertedWith("INSUFFICIENT_MEMBERS");
+
+      // Check nonce
+      expect(await walletContract.nonce()).to.equal(0);
+    });
+
+    it("Should reject transaction when duplicates are present", async function () {
+      // Create a transaction and check if it executes
+      const t: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+      const members = [member1, member1];
+      const { v, r, s } = await getSignatureArrays(t, members);
+
+      // Check transaction
+      await expect(
+        walletContract.executeTransaction(
+          t,
+          v,
+          r,
+          s,
+          members.map((member) => member.address)
+        )
+      ).to.be.revertedWith("DUPLICATE_ADDRESSES");
+
+      // Check nonce
+      expect(await walletContract.nonce()).to.equal(0);
+    });
+    it("Should reject transaction if non member signature is provided", async function () {
+      // Create a transaction and check if it executes
+      const t: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+      const members = [owner1, member3];
+      const { v, r, s } = await getSignatureArrays(t, members);
+
+      // Check transaction
+      // Check transaction
+      await expect(
+        walletContract.executeTransaction(
+          t,
+          v,
+          r,
+          s,
+          members.map((member) => member.address)
+        )
+      ).to.be.revertedWith("ADDRESS_NOT_MEMBER");
+
+      // Check nonce
+      expect(await walletContract.nonce()).to.equal(0);
+    });
+    it("Should reject transaction if wallet address is wrong", async function () {
+      // Create a transaction and check if it executes
+      const t: Transaction = {
+        wallet: member1.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 0,
+      };
+      const members = [owner1, member2];
+      const { v, r, s } = await getSignatureArrays(t, members);
+
+      // Check transaction
+      // Check transaction
+      await expect(
+        walletContract.executeTransaction(
+          t,
+          v,
+          r,
+          s,
+          members.map((member) => member.address)
+        )
+      ).to.be.revertedWith("WALLET_ADDRESS_MISMATCH");
+
+      // Check nonce
+      expect(await walletContract.nonce()).to.equal(0);
+    });
+    it("Should reject transaction if invalid nonce is provided", async function () {
+      // Create a transaction and check if it executes
+      const t: Transaction = {
+        wallet: walletContract.address,
+        to: member3.address,
+        amount: 10,
+        transactionType: 0,
+        token: "0x0000000000000000000000000000000000000000",
+        nonce: 1,
+      };
+      const members = [owner1, member2];
+      const { v, r, s } = await getSignatureArrays(t, members);
+
+      // Check transaction
+      // Check transaction
+      await expect(
+        walletContract.executeTransaction(
+          t,
+          v,
+          r,
+          s,
+          members.map((member) => member.address)
+        )
+      ).to.be.revertedWith("INVALID_NONCE");
 
       // Check nonce
       expect(await walletContract.nonce()).to.equal(0);
