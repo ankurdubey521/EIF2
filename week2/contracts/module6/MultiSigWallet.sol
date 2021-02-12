@@ -34,6 +34,14 @@ contract MultiSigWallet {
     console.log("constructor: wallet created by ", msg.sender);
   }
 
+  /**
+   * @dev Allows recieving wei/eth
+   */
+  receive() external payable {
+    console.log("receive: Recieved ", msg.value, " wei");
+    console.log("receive: Current Balance: ", address(this).balance);
+  }
+
   // Member Control Methods
 
   /**
@@ -177,7 +185,7 @@ contract MultiSigWallet {
    * @return bool true if there are no duplicates
    */
   function checkNoDuplicates(address[] memory addressList)
-    public
+    internal
     pure
     returns (bool)
   {
@@ -229,14 +237,78 @@ contract MultiSigWallet {
     // Transaction Parameters Verification
     require(t.wallet == address(this), "WALLET_ADDRESS_MISMATCH");
     require(t.nonce == nonce, "INVALID_NONCE");
+    require(
+      t.transactionType == 0 || t.transactionType == 1,
+      "INVALID_TRANSACTION_TYPE"
+    );
+
+    if (t.transactionType == 0) {
+      verifyEthTransaction(t);
+    } else if (t.transactionType == 1) {
+      verifyErc20Transaction(t);
+    }
+
+    console.log("verifyTransaction: transaction verified");
     return true;
   }
 
   /**
-   * @dev Allows recieving wei/eth
+   * @dev Verifies the amount in eth transaction.
+   *      Supposed to be called only from verifyTransaction
+   * @param t Transaction to be verified
+   * @return bool validity of transaction
    */
-  receive() external payable {
-    console.log("receive: Recieved ", msg.value, " wei");
-    console.log("receive: Current Balance: ", address(this).balance);
+  function verifyEthTransaction(Transaction memory t)
+    internal
+    view
+    returns (bool)
+  {
+    // Check account balance against amount
+    require(t.amount <= address(this).balance);
+    return true;
+  }
+
+  /**
+   * @dev Verifies the amount in token transaction.
+   *      Supposed to be called only from verifyTransaction
+   * @param t Transaction to be verified
+   * @return bool validity of transaction
+   */
+  function verifyErc20Transaction(Transaction memory t)
+    internal
+    pure
+    returns (bool)
+  {
+    // TODO: IMPLEMENT
+    t.token;
+    return true;
+  }
+
+  // Transaction Execution
+
+  /**
+   * @dev Verfies and Executes Transaction based on type
+   * @param t transaction to be executed
+   * @param v array of v of signatures
+   * @param r array of r of signatures
+   * @param s array of s of signatures
+   * @param memberAddresses array of addresses of members
+   */
+  function executeTransaction(
+    Transaction memory t,
+    uint8[] memory v,
+    bytes32[] memory r,
+    bytes32[] memory s,
+    address[] memory memberAddresses
+  ) public payable onlyMember {
+    verifyTransaction(t, v, r, s, memberAddresses);
+    if (t.transactionType == 0) {
+      (bool sent, ) = t.to.call{ value: t.amount }("");
+      require(sent, "ETH_SEND_FAILED");
+      nonce += 1;
+      console.log("executeTransaction: Transaction Successfull");
+    } else if (t.transactionType == 1) {
+      // TODO: implement
+    }
   }
 }
