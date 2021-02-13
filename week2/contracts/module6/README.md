@@ -37,4 +37,4 @@ struct Transaction {
 
 ## Executing a transaction
 
-The contract exposes a public function `executeTransaction(transaction, v[], r[], s[], memberAddresses[])` which verifies all the signatures `v,r,s` against the `memberAddresses` array, and then executes the transaction. Members are expected to coordinate online to create and sign the transactions.
+The contract exposes a public function `executeTransaction(transaction, v[], r[], s[], memberAddresses[])` which verifies all the signatures `v,r,s` against the `memberAddresses` array, and then executes the transaction. Members are expected to coordinate offline to create and sign the transactions.
