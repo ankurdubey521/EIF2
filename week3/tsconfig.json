@@ -68,6 +68,6 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },
 
-  "include": ["utils"],
+  "include": ["utils", "scripts", "constants"],
   "files": ["./hardhat.config.ts"]
 }

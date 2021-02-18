@@ -11,7 +11,6 @@ import {
 } from "../constants/contractMainnetAddress";
 import { ERC20_ABI } from "../constants/abi/erc20abi";
 import { COMPOUND_COMPTROLLER_ABI } from "../constants/abi/compound/comptroller";
-import { getSigner } from "./forkedAccountProvider";
 import { BigNumber } from "ethers";
 
 const takeUsdtLoanAgainstDai = async (
