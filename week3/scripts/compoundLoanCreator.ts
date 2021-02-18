@@ -78,15 +78,4 @@ const takeUsdtLoanAgainstDai = async (
   );
 };
 
-const main = async () => {
-  const signer = await getSigner();
-  //  const [signer] = await ethers.getSigners();
-  console.log(`signer address: ${signer.address}`);
-  await takeUsdtLoanAgainstDai(
-    signer,
-    BigNumber.from("5000000000000000000"),
-    BigNumber.from("2000000")
-  );
-};
-
-main().then(() => {});
+export default takeUsdtLoanAgainstDai;
