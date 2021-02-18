@@ -1,18 +1,18 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
-import { parseEther } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 import hardhat from "hardhat";
 
-import { ERC20_ABI } from "./erc20abi";
-
-const usdtRichAddress = "0xbe0eb53f46cd790cd13851d5eff43d12404d33e8";
-const usdtTokenAddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+import { ERC20_ABI } from "../constants/erc20abi";
+import {
+  ADDRESS_TOKEN_USDT,
+  ADDRESS_EOA_USDT_RICH,
+} from "../constants/contractMainnetAddress";
 
 let getSigner = async (): Promise<SignerWithAddress> => {
   const [testSigner] = await ethers.getSigners();
   // Initialize USDT token contract
   const usdtToken = new ethers.Contract(
-    usdtTokenAddress,
+    ADDRESS_TOKEN_USDT,
     ERC20_ABI,
     testSigner
   );
@@ -20,11 +20,12 @@ let getSigner = async (): Promise<SignerWithAddress> => {
   // Start impersonating account with high USDT balance
   await hardhat.network.provider.request({
     method: "hardhat_impersonateAccount",
-    params: [usdtRichAddress],
+    params: [ADDRESS_EOA_USDT_RICH],
   });
   const usdtRichSignerImpersonator = await ethers.provider.getSigner(
-    usdtRichAddress
+    ADDRESS_EOA_USDT_RICH
   );
+
   // Send 100 USDT to testSigner
   console.log(
     "forkedAccoutnProvider: Transferring USDT to testSigner.address..."
@@ -43,14 +44,12 @@ let getSigner = async (): Promise<SignerWithAddress> => {
   // Stop impersonation
   await hardhat.network.provider.request({
     method: "hardhat_stopImpersonatingAccount",
-    params: [usdtRichAddress],
+    params: [ADDRESS_EOA_USDT_RICH],
   });
 
   getSigner = async (): Promise<SignerWithAddress> => testSigner;
 
   return testSigner;
 };
-
-getSigner().then(() => {});
 
 export { getSigner };
