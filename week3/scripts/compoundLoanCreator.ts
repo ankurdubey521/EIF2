@@ -17,7 +17,8 @@ import { BigNumber } from "ethers";
 
 const takeUsdtLoanAgainstDai = async (
   signer: SignerWithAddress,
-  daiToSupplyAsCollateral: BigNumber
+  daiToSupplyAsCollateral: BigNumber,
+  usdtToLoan: BigNumber
 ) => {
   const usdtToken = new ethers.Contract(ADDRESS_TOKEN_USDT, ERC20_ABI, signer);
   const daiToken = new ethers.Contract(ADDRESS_TOKEN_DAI, ERC20_ABI, signer);
@@ -68,8 +69,8 @@ const takeUsdtLoanAgainstDai = async (
   );
 
   // Borrow 2 USDT
-  console.log("takeUsdtLoanAgainstDai: Taking loan of 2 USDT....");
-  await cUsdtToken.borrow(BigNumber.from("2000000"));
+  console.log(`takeUsdtLoanAgainstDai: Taking loan of ${usdtToLoan} USDT....`);
+  await cUsdtToken.borrow(usdtToLoan);
   console.log(
     `takeUsdtLoanAgainstDai: current USDT balance: ${await usdtToken.balanceOf(
       signer.address
@@ -81,7 +82,11 @@ const main = async () => {
   const signer = await getSigner();
   //  const [signer] = await ethers.getSigners();
   console.log(`signer address: ${signer.address}`);
-  await takeUsdtLoanAgainstDai(signer, BigNumber.from("5000000000000000000"));
+  await takeUsdtLoanAgainstDai(
+    signer,
+    BigNumber.from("5000000000000000000"),
+    BigNumber.from("2000000")
+  );
 };
 
 main().then(() => {});
