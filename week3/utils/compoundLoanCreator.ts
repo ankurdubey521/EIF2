@@ -1,8 +1,7 @@
 import { ethers } from "hardhat";
-import hardhat from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 
-import { CERC20_ABI } from "../constants/cerc20abi";
+import { CERC20_ABI } from "../constants/abi/compound/cerc20abi";
 import {
   ADDRESS_CONTRACT_COMPOUND_COMPTROLLER,
   ADDRESS_TOKEN_CDAI,
@@ -10,8 +9,8 @@ import {
   ADDRESS_TOKEN_DAI,
   ADDRESS_TOKEN_USDT,
 } from "../constants/contractMainnetAddress";
-import { ERC20_ABI } from "../constants/erc20abi";
-import { COMPOUND_COMPTROLLER_ABI } from "../constants/comptroller";
+import { ERC20_ABI } from "../constants/abi/erc20abi";
+import { COMPOUND_COMPTROLLER_ABI } from "../constants/abi/compound/comptroller";
 import { getSigner } from "./forkedAccountProvider";
 import { BigNumber } from "ethers";
 

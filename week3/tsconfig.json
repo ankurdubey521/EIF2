@@ -68,6 +68,6 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },
 
-  "include": ["./scripts", "scripts", "constants/erc20abi.ts"],
+  "include": ["utils"],
   "files": ["./hardhat.config.ts"]
 }

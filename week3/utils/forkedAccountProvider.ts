@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { ethers } from "hardhat";
 import hardhat from "hardhat";
 
-import { ERC20_ABI } from "../constants/erc20abi";
+import { ERC20_ABI } from "../constants/abi/erc20abi";
 import {
   ADDRESS_TOKEN_USDT,
   ADDRESS_EOA_USDT_RICH,
@@ -24,40 +24,6 @@ let getSigner = async (): Promise<SignerWithAddress> => {
     ERC20_ABI,
     testSigner
   );
-
-  /*
-
-  // Start impersonating account with high USDT balance
-  await hardhat.network.provider.request({
-    method: "hardhat_impersonateAccount",
-    params: [ADDRESS_EOA_USDT_RICH],
-  });
-  const usdtRichSignerImpersonator = await ethers.provider.getSigner(
-    ADDRESS_EOA_USDT_RICH
-  );
-
-  // Send 100 USDT to testSigner
-  console.log(
-    "forkedAccoutnProvider: Transferring USDT to testSigner.address..."
-  );
-  await usdtToken
-    .connect(usdtRichSignerImpersonator)
-    .transfer(testSigner.address, Math.floor(100 * 1e6));
-
-  // Check if balance was updated
-  console.log(
-    `forkedAccoutnProvider: testSigner.address USDT balance: ${await usdtToken.balanceOf(
-      testSigner.address
-    )}`
-  );
-
-  // Stop impersonation
-  await hardhat.network.provider.request({
-    method: "hardhat_stopImpersonatingAccount",
-    params: [ADDRESS_EOA_USDT_RICH],
-  });
-
-*/
 
   // Start impersonating account with high DAI balance
   await hardhat.network.provider.request({
