@@ -4,41 +4,74 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 
 import { CERC20_ABI } from "../constants/cerc20abi";
 import {
+  ADDRESS_CONTRACT_COMPOUND_COMPTROLLER,
+  ADDRESS_TOKEN_CDAI,
   ADDRESS_TOKEN_CUSDT,
+  ADDRESS_TOKEN_DAI,
   ADDRESS_TOKEN_USDT,
 } from "../constants/contractMainnetAddress";
 import { ERC20_ABI } from "../constants/erc20abi";
+import { COMPOUND_COMPTROLLER_ABI } from "../constants/comptroller";
 import { getSigner } from "./forkedAccountProvider";
+import { BigNumber } from "ethers";
 
-const takeDaiLoanAgainstUsdt = async (
+const takeUsdtLoanAgainstDai = async (
   signer: SignerWithAddress,
-  usdtToSupplyAsCollateral: number
+  daiToSupplyAsCollateral: BigNumber
 ) => {
   const usdtToken = new ethers.Contract(ADDRESS_TOKEN_USDT, ERC20_ABI, signer);
-  const cusdtToken = new ethers.Contract(
+  const daiToken = new ethers.Contract(ADDRESS_TOKEN_DAI, ERC20_ABI, signer);
+
+  const cUsdtToken = new ethers.Contract(
     ADDRESS_TOKEN_CUSDT,
     CERC20_ABI,
     signer
   );
+  const cDaiToken = new ethers.Contract(ADDRESS_TOKEN_CDAI, CERC20_ABI, signer);
+  const comptrollerContract = new ethers.Contract(
+    ADDRESS_CONTRACT_COMPOUND_COMPTROLLER,
+    COMPOUND_COMPTROLLER_ABI,
+    signer
+  );
 
   console.log(
-    `takeDaiLoanAgainstUsdt: approving ${usdtToSupplyAsCollateral} USDT transfer...`
+    `takeUsdtLoanAgainstDai: approving ${daiToSupplyAsCollateral} DAI transfer...`
   );
   // Approve token transfer
-  await usdtToken.approve(ADDRESS_TOKEN_CUSDT, usdtToSupplyAsCollateral);
+  await daiToken.approve(ADDRESS_TOKEN_CDAI, daiToSupplyAsCollateral);
   // Mint ctokens
-  console.log(`takeDaiLoanAgainstUsdt: minting cUSDT...`);
-  await cusdtToken.mint(usdtToSupplyAsCollateral, {
-    gasLimit: 9500000,
-  });
+  console.log(`takeUsdtLoanAgainstDai: minting cDAI...`);
+  await cDaiToken.mint(daiToSupplyAsCollateral);
 
   console.log(
-    `takeLoanAgainstUsdt: current USDT balance: ${await usdtToken.balanceOf(
+    `takeUsdtLoanAgainstDai: current DAI balance: ${await daiToken.balanceOf(
       signer.address
     )}`
   );
   console.log(
-    `takeLoanAgainstUsdt: current cUSDT balance: ${await cusdtToken.balanceOf(
+    `takeUsdtLoanAgainstDai: current cDAI balance: ${await cDaiToken.balanceOf(
+      signer.address
+    )}`
+  );
+
+  // Enter the market
+  console.log("takeUsdtLoanAgainstDai: Entering the DAI market...");
+  const errors: number[] = await comptrollerContract.enterMarkets([
+    ADDRESS_TOKEN_CDAI,
+  ]);
+
+  // Get Account Liquidity
+  console.log(
+    `takeUsdtLoanAgainstDai: Account Liquidity: ${await comptrollerContract.getAccountLiquidity(
+      signer.address
+    )}`
+  );
+
+  // Borrow 2 USDT
+  console.log("takeUsdtLoanAgainstDai: Taking loan of 2 USDT....");
+  await cUsdtToken.borrow(BigNumber.from("2000000"));
+  console.log(
+    `takeUsdtLoanAgainstDai: current USDT balance: ${await usdtToken.balanceOf(
       signer.address
     )}`
   );
@@ -46,7 +79,9 @@ const takeDaiLoanAgainstUsdt = async (
 
 const main = async () => {
   const signer = await getSigner();
-  await takeDaiLoanAgainstUsdt(signer, 5);
+  //  const [signer] = await ethers.getSigners();
+  console.log(`signer address: ${signer.address}`);
+  await takeUsdtLoanAgainstDai(signer, BigNumber.from("5000000000000000000"));
 };
 
 main().then(() => {});
