@@ -45,7 +45,7 @@ let getSigner = async (): Promise<SignerWithAddress> => {
   );
   await daiToken
     .connect(daiRichSignerImpersonator)
-    .transfer(testSigner.address, BigNumber.from("10000000000000000000"));
+    .transfer(testSigner.address, BigNumber.from("100000000000000000000"));
 
   // Check if balance was updated
   console.log(

@@ -4,13 +4,13 @@ import { BigNumber } from "ethers";
 
 import {
   ADDRESS_CONTRACT_PROTOCOL_DATA_PROVIDER,
-  ADDRESS_TOKEN_DAI,
+  ADDRESS_TOKEN_USDT,
 } from "../constants/contractMainnetAddress";
 import { PROTOCOL_DATA_PROVIDER_ABI } from "../constants/abi/aave/protocolDataProvider";
 import { DEBT_TOKEN_ABI } from "../constants/abi/aave/debtToken";
 
-const delegateDaiLoan = async (
-  daiTokenAmount: BigNumber,
+const delegateUsdtLoan = async (
+  usdtTokenAmount: BigNumber,
   delegator: SignerWithAddress,
   delegateeAddress: string
 ) => {
@@ -20,14 +20,12 @@ const delegateDaiLoan = async (
     delegator
   );
 
-  // Get DAI debt token address
+  // Get USDT debt token address
   const tokenDetails = await providerContract.getReserveTokensAddresses(
-    ADDRESS_TOKEN_DAI
+    ADDRESS_TOKEN_USDT
   );
   console.log(
-    `delegateDaiLoan: found DAI debt token address: ${JSON.stringify(
-      tokenDetails
-    )}`
+    `delegateDaiLoan: found USDT debt token address: ${tokenDetails[1]}`
   );
 
   // Approve the delegation of loan
@@ -36,10 +34,7 @@ const delegateDaiLoan = async (
     DEBT_TOKEN_ABI,
     delegator
   );
-  await stableDebtContract.approveDelegation(
-    delegateeAddress,
-    BigNumber.from("1000000000000000000000000")
-  );
+  await stableDebtContract.approveDelegation(delegateeAddress, usdtTokenAmount);
   // Verify delegation
   console.log(
     `delegateDaiLoan: Updated borrowAllowance to ${await stableDebtContract.borrowAllowance(
@@ -49,4 +44,4 @@ const delegateDaiLoan = async (
   );
 };
 
-export default delegateDaiLoan;
+export default delegateUsdtLoan;

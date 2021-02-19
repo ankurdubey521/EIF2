@@ -74,6 +74,13 @@ const takeUsdtLoanAgainstDai = async (
       signer.address
     )}`
   );
+
+  // Get Account Liquidity
+  console.log(
+    `takeUsdtLoanAgainstDai: Account Liquidity: ${await comptrollerContract.getAccountLiquidity(
+      signer.address
+    )}`
+  );
 };
 
 export default takeUsdtLoanAgainstDai;
