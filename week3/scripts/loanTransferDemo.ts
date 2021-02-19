@@ -44,7 +44,7 @@ const loanTransferDemo = async () => {
 
   // Send Contract some usdt to cover loan premiums
   console.log("--loanTransfer: sending usdt to contract...");
-  await sendUsdt(contract.address, parseUsdt(100), signer);
+  await sendUsdt(contract.address, parseUsdt(1), signer);
 
   // Start the flash loan
   console.log("--loanTransfer: intiliazing flash loan...");
