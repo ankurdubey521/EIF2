@@ -105,7 +105,7 @@ Our cohort was assigned the **Lending and Borrowing + StableCoins** niche. The f
 
 MakerDAO is a very interesting project, as it is (probably) the first stable-coin that operates in a completely decentralized manner. Stablecoins are cryptocurrencies that are designed to resist changes in their value, and in DAI's case, its value is pegged to 1 USD. There are other centralized stable-coins as well such as [Tether](https://tether.to/) and [USDC](https://www.circle.com/en/usdc), but DAI has become much more popular due to its decentralized aspect. Once again, going through the [MakerDAO White Paper](https://makerdao.com/en/whitepaper) was enough to give me a decent understanding of the project, and create a small [presentation](https://docs.google.com/presentation/d/1X0clhDnVCwu6myD5jmeZ7J50v14_XeiG0TG-4LiaaRM/edit?usp=sharing) on top of it.
 
-I did not want to limit myself to a single topic and as I still had time, I decided to look into the other three protocols. However, this is where my relative inexperience with financial terminology started catching up with me. AAVE and Compound are very similar, both are lending protocols and operate on a similar set of principles. I had spent some time researching how lending works in the normal Centralized Finance world and then jumped into the DeFi counterparts. [Finematic's](https://www.youtube.com/channel/UCh1ob28ceGdqohUnR7vBACA) videos on DeFi proved to be extremely helpful as they also cover the required financial background to understand the DeFi protocol in question. Once I developed a basic understanding I went through both AAVE's and Compound's Developer Documentation, and made the following conclusions:
+I did not want to limit myself to a single topic and as I still had time, I decided to look into the other three protocols. However, this is where my relative inexperience with financial terminology started catching up with me. AAVE and Compound are very similar, both are lending protocols and operate on a similar set of principles. I had spent some time researching how lending works in the normal Centralized Finance world and then jumped into the DeFi counterparts. [Finematics'](https://www.youtube.com/channel/UCh1ob28ceGdqohUnR7vBACA) videos on DeFi proved to be extremely helpful as they also cover the required financial background to understand the DeFi protocol in question. Once I developed a basic understanding I went through both AAVE's and Compound's Developer Documentation, and made the following conclusions:
 1. Both AAVE and Compound allow you to deposit ETH and ERC20 tokens as collateral, and borrow a different ERC20 token as a loan against the collateral. AAVE issues aTokens against the collateral, and Compound issues cTokens, which can be liquidated to get back your collateral.
 2. Compound provides variable interest rates only, while AAVE provides both stable and variable interest rates on your collateral depending on the token.
 3. One of AAVE's main differentiating factors is its flash loan service, which allows you to take an uncollateralized loan of any amount of crypto as long as you return the loan within the same transaction. This has a wide range of applications, the most popular being arbitrage bots.
@@ -116,8 +116,30 @@ I noticed that flash loans can be used for many applications where the net resul
 
 To mention a couple of difficulties I faced:
 1. There was a lot of material to cover, so had to rush through certain sections to complete in time.
-2. The test loan that I took was USDT against DAI. Apparently on main-net USDT's approve function doesn't return anything when it should be returning a bool according to ERC20 spec, which caused a bug that took me a long time to trace. Had to use openzeppelin's [SafeERC20](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#SafeERC20) to fix that.
+2. The test loan that I took was USDT against DAI. Apparently on main-net USDT's approve function doesn't return anything when it should be returning a bool according to ERC20 spec, which caused a bug that took me a long time to trace. Had to use openzeppelin's [SafeERC20](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#SafeERC20) wrapper to fix that.
 
 Hardhat's [Mainnet Forking](https://hardhat.org/guides/mainnet-forking.html) feature helped with the development, as it allowed me to directly interface with main-net contracts of AAVE and Compound from my local hardhat node, allowing me to test on the actual contracts without spending any gas or real money.
 
 I learned a lot about DeFi this week, therefore dΦ/dt was at its peak.
+
+# Week 4: BUIDLing for EtherPunk
+We fellows thought that the last week was hectic, turns out that was just to prepare us for this week.
+
+Enter EtherPunk. EtherPunk originally kicked off on 22nd January and was to end on February 28th, exactly one week for now. The fellows were encouraged to buidl and submit a hack in a week. There were no general prizes in this hackathon; as such we were heavily incentivized to incorporate as many bounties into our hack as possible. This meant researching a couple of different (and unfamiliar) protocols, coming up with a good idea, and finally implementing everything in one week. Initially, I was uncertain if I would be able to pull it off but decided to participate anyway and see how far I could go, a very good decision in retrospect.
+
+I teamed up [Dipanwita](https://github.com/susiejojo), a fellow from the same cohort. Here's her [write-up](https://www.notion.so/Looking-back-at-Week4-Letting-my-imagination-run-wild-2401d9327e094c4dacb1bf4456bd0268) of how the whole week progressed, make sure to give it a read! 
+
+We decided to build [🌪 HurriCARE 🌪](https://github.com/ankurdubey521/HurriCARE), a decentralized insurance platform where you pay a premium based on your location and get super-fast guaranteed relief funds when you are hit by a cyclone or a hurricane.
+The project's backbones were the [SuperFluid](https://www.superfluid.finance) and [Chainlink](https://chain.link) protocols. We utilized SuperFluid to allow gasless streaming of premiums from users and the protocol gave us an easy way to track which users are currently paying premiums and which are not. Chainlink was used to get the location data from OpenWeatherApi on-chain, using which we decided when to disburse relief funds to affected individuals. Chainlink's alarm clock was also essential for running the check function periodically.
+
+In addition to these, the project was deployed on [Polygon (previously Matic)](https://matic.network) Mumbai test-net and supported [Metamask](https://metamask.io) and [Portis](https://www.portis.io) as login methods.
+
+To mention a couple of challenges that we ran into:
+1. Our knowledge of DeFi being a little over a week old, we struggled to understand a lot of the concepts and architecture of the protocols as well as following docs religiously and implementing them. 
+2. Further, we tested our contracts on the test-nets, but while switching networks we realized that a lot of features were not cross-network, such as the Chainlink Alarm Clock oracle on Matic.
+3.  Also since our application is heavily dependent on current weather conditions, it was difficult to test and demo our application, and we had to simulate using scripts to test out our contracts.
+
+Our [hack](https://devfolio.co/submissions/hurricare-5e67) won the runner-up bounties of both SuperFluid and Chainlink, which amounted to a total of 1000$ in crypto. 🤩
+
+Video Demo: 
+ [![hurriCARE](https://img.youtube.com/vi/KZ0pRlZStT8/0.jpg)](https://www.youtube.com/watch?v=KZ0pRlZStT8)
