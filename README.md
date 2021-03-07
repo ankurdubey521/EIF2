@@ -43,11 +43,42 @@ Once the node was up querying it was comparatively simpler. The only part where 
 
 It was mostly smooth scaling for this week after that, didn't really face any issue with the Merkle tree implementation. I was done with my assignments by Thursday.
 
-## Week 1 Subsection: Uniswap and revelation of the "why" behind DeFi.
+### Epilogue: Uniswap and revelation of the "why" behind DeFi.
 [Denver](https://www.linkedin.com/in/denverjude/) the fellowship organiser, randomly invited us for a call on night on discord to discuss how things were going and similar stuff. As we discussed stuff he introduced [Uniswap](https://uniswap.org/blog/uniswap-v2/), a protocol for providing onchain liquidity and token swaping in a completely decentralized way. I was intrigued, and decide to research into it further.
 
 I went through some of their [documentation](https://uniswap.org/docs/v2) and their [whitepaper](https://uniswap.org/whitepaper.pdf). At the heart of uniswap are it's liquidity pools, which are based on a constraint called the [constant product rule](https://uniswap.org/docs/v2/protocol-overview/glossary/#constant-product-formula). To state it simply, the product of the quantites of two tokens inside a pool must remain not change after a trade has been made.
 
-It is this constaint that ensures that the conversion ratio between two tokens of a liquidity pool always converges to their external "real" price ratio in terms of their value in fiat (or just value). Initially this constraint made no sense to me from a mathematical point of view. However once I dug deeper and understood the various economic incentives and did the actual math for myself (basically assuming the constraint and figuring out it's effect on the conversation ratio of the tokens) I realised how beatifully the simple looking constraint abstracts the mechanisms required to maintain the price, *without* relying on any external information about the prices of the tokens, making it truly decentralized. 
+It is this constaint that ensures that the conversion ratio between two tokens of a liquidity pool always converges to their external "real" price ratio in terms of their value in fiat (or just value). Initially this constraint made no sense to me from a mathematical point of view. However once I dug deeper and understood the various economic incentives and did the actual math for myself (basically assuming the constraint and figuring out it's effect on the conversation ratio of the tokens) I realised how beatifully the simple looking constraint abstracts the mechanisms required to maintain the price, **without** relying on any external information about the prices of the tokens, making it truly decentralized. 
 
 I think it was at this moment I began to grasp the "why" behind DeFi and the craze behind it. Solutions like these are simple, require no (and are resistant to) human intervention and just "run" on their own.
+
+# Week 2: The birth of CryptoPizza 🍕
+Week 2 was all about solidity and smart contract development. As a pre-week exercise we were asked to complete the first three modules of the awesome [CryptoZombies](https://cryptozombies.io) tutorial. It was pretty fun going through the modules and testing out solidity stuff on the go. Would definitely recommend checking them out if you're starting with Solidity Development. This was followed by various getting acquainted with Remix as an IDE, and basic usage of `ethers`.
+
+I had heard about [Hardhat](https://hardhat.org/) from one of the EtherPunk sessions. It's a development framework like [Truffle Suit](https://www.trufflesuite.com/) which allows you to rapidly test and deploy smart contract and most notably, allows you to perform `console.log()` operations from within your contract. A couple of mentors also recommended using hardhat, so I switched to it for the remainder of the fellowship. In retrospect this was a very good decision, as hardhat's debugging and scripting capabilites proved to be extremely useful for the rest of the module and in all coming weeks.
+
+This week had three major goals:
+1. To create our own ERC20 token (equivalently, a new cryptocurrency) and launch it on the goerli testnet. Also create a liquity pool on uniswap so that other people could buy your token using goETH.
+2. To implement a dead man's switch contract.
+3. To create a simple multisig wallet.
+
+### Creating our own ERC20 token
+This was easier than it sounds. One can think of [ERC20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) as a standard which defines the standard for creating fungible cryptocurrencies on Ethereum. You basically deploy a smart contract that is responsible for maintaining the balances of each address that holds your token and associated functions responsible for token transfer between contracts. This is nicely explained in the ERC20 standard, I didn't really face much issues here. 
+
+I launched [PIZZA🍕](https://goerli.etherscan.io/token/0x80f4150deaacf17ba2ae00d7206d8e985521eab4) on Goerli Testnet. Now whenever someone pings me for a party, I can just send these tokens to them instead😂.
+
+I did get stuck in a slighltly awkward place during pool creation on uniswap. Basically when you use the uniswap ui and create a pool it's not apparent where you're supposed to get the pool address from. I couldn't find it anywhere on the dashboards, so in the end I had to use React DevTools to extract the pool address from the component state.
+![image](https://user-images.githubusercontent.com/16562513/110238960-70c2af00-7f6a-11eb-9a7d-dc61dee82c0b.png)
+
+# The DeadMan's switch contract
+> A well-known problem for cryptocurrency holders is that all funds are lost if the owner is incapacitated and has not shared his/her private key with anyone else.
+
+The goal was to write a smart contract that will send all of its balance to a pre-set address if the owner of that contract has not called a `still_alive` function on the contract in the last 10 blocks.
+
+Checking the condition proved to be a relatively simple exercise, and overall I didn't face any issue as such implementing the contract. However, I'd like to highlight the problem of sending funds from the contract to a trusted owner. This can be handled in two major ways, both having pros and cons and we had good discussion amnogst the fellows highlighting the same:
+1. The first is to just call the solidity `transfer()` function and transfer all funds to the preset address, and then mark the contract as non-operational. 
+2. Another option is to use the special `selfdestruct()` call, which optionally takes an address as a parameter. What self destruct does is that it actually deletes** the contract and it's state from the blockchain and sends any funds the contract holds to the address specified as the parameter. The advantage of doing this is that `selfdestuct()` consumes negative gas (making the transaction cost less) and the downside being that the contract's functions can stll be called but they won't have any effect. Consequenctly any further funds sent to the contract would be lost forever.
+
+We did not reach a clear consensus on which method was better in this case, so I'll just leave [this](https://ethereum.stackexchange.com/questions/315/why-are-selfdestructs-used-in-contract-programming) stackoverflow thread here for now.
+
+** when I say delete I mean that the contract is rendered in-operational from the latest block, not that it's removed from all previous blocks in history (which is not possible as blockchains are immutable).
