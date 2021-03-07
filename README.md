@@ -44,7 +44,7 @@ Once the node was up querying it was comparatively simpler. The only part where 
 It was mostly smooth scaling for this week after that, didn't really face any issue with the Merkle tree implementation. I was done with my assignments by Thursday.
 
 ### Epilogue: Uniswap and revelation of the "why" behind DeFi.
-[Denver](https://www.linkedin.com/in/denverjude/) the fellowship organiser, randomly invited us for a call on night on discord to discuss how things were going and similar stuff. As we discussed stuff he introduced [Uniswap](https://uniswap.org/blog/uniswap-v2/), a protocol for providing onchain liquidity and token swaping in a completely decentralized way. I was intrigued, and decide to research into it further.
+[Denver](https://www.linkedin.com/in/denverjude/) (the fellowship organiser), randomly invited us for a call on night on discord to discuss how things were going and similar stuff. As we discussed stuff he introduced [Uniswap](https://uniswap.org/blog/uniswap-v2/), a protocol for providing onchain liquidity and token swaping in a completely decentralized way. I was intrigued, and decide to research into it further.
 
 I went through some of their [documentation](https://uniswap.org/docs/v2) and their [whitepaper](https://uniswap.org/whitepaper.pdf). At the heart of uniswap are it's liquidity pools, which are based on a constraint called the [constant product rule](https://uniswap.org/docs/v2/protocol-overview/glossary/#constant-product-formula). To state it simply, the product of the quantites of two tokens inside a pool must remain not change after a trade has been made.
 
