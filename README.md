@@ -142,4 +142,5 @@ To mention a couple of challenges that we ran into:
 Our [hack](https://devfolio.co/submissions/hurricare-5e67) won the runner-up bounties of both SuperFluid and Chainlink, which amounted to a total of 1000$ in crypto. 🤩
 
 Video Demo: 
+
  [![hurriCARE](https://img.youtube.com/vi/KZ0pRlZStT8/0.jpg)](https://www.youtube.com/watch?v=KZ0pRlZStT8)
