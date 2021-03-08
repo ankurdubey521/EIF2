@@ -141,7 +141,7 @@ To mention a couple of challenges that we ran into:
 
 Our [hack](https://devfolio.co/submissions/hurricare-5e67) won the runner-up bounties of both SuperFluid and Chainlink, which amounted to a total of 1000$ in crypto🤩. Aside from the bounties we won this victory also symbolized that we'd made real progress over these four weeks as DeFi developers, especially considering that four weeks ago a lot of the stuff covered in the EtherPunk sessions just flew over my head.
 
-This is not to say that we did not have external help. Throughout the hackathon, we had the full support of the Chainlink and SuperFluid communities. We hopped over to their discord servers and any questions or issues would be resolved within a day. This allowed us to get started with their SDKs quickly and focus on the main business logic of the app.
+Throughout the hackathon, we had the full support of the Chainlink and SuperFluid communities. We hopped over to their discord servers and any questions or issues would be resolved within a day. This allowed us to get started with their SDKs quickly and focus on the main business logic of the app.
 
 Video Demo: 
 
