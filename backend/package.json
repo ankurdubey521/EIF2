@@ -1,0 +1,19 @@
+{
+  "name": "weather_insurance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "request-promise": "^4.2.6",
+    "rimble-ui": "^0.14.0",
+    "styled-components": "^5.2.1"
+  }
+}
