@@ -41,7 +41,7 @@ To set the context, the laptop that I use had a core i7-9750H 6c12t processor, 3
 
 Once the node was up querying it was comparatively simpler. The only part where I got stuck for some time was the task to find the first block on which a smart contract is deployed on the Goerli chain (it's [12841](https://goerli.etherscan.io/block/12841), go check it out 😃). This required one to scan for a special kind of transaction called a ["contract creating transaction"](https://github.com/ethereumbook/ethereumbook/blob/develop/06transactions.asciidoc#special-transaction-contract-creation), the properties of which I was unaware off. I had to spend quite a while googling until I became aware of the existence of such transactions.
 
-It was mostly smooth scaling for this week after that, didn't face any issue with the Merkle tree implementation. I was done with my assignments by Thursday.
+It was mostly smooth sailing for this week afterwards, didn't face any issue with the Merkle tree implementation. I was done with my assignments by Thursday.
 
 ### Epilogue: Uniswap and revelation of the "why" behind DeFi.
 [Denver](https://www.linkedin.com/in/denverjude/) (the fellowship organizer), randomly invited us for a call one night on discord to discuss how things were going and similar stuff. As we discussed stuff he introduced [Uniswap](https://uniswap.org/blog/uniswap-v2/), a protocol for providing on-chain liquidity and token swapping in a completely decentralized way. I was intrigued, and decide to research into it further.
